@@ -1,0 +1,44 @@
+{
+    "database": {
+        "user": "odb_test",
+        "password": "odb_test_pw",
+        "database": "odb_test",
+        "charset": "utf8"
+    },
+    
+    "log": {
+        "level": "trace"
+    },
+    
+    "loctree": {
+        "loctree": "${comppi_root}/sources/loctree/loctree.textile",
+        "largelocs": "${comppi_root}/sources/loctree/largelocs.yml"
+    },
+    
+    "systemtype": {
+        "system": "${comppi_root}/sources/systemtype/system.csv",
+        "synonym": "${comppi_root}/sources/systemtype/synonym.csv"
+    },
+    
+    "driver": {
+        "sourcePath": "${comppi_root}/sources/",
+        "species": [
+            {
+                "abbreviation": "ce",
+                "name": "Caenorhabditis Elegans"
+            },
+            {
+                "abbreviation": "dm",
+                "name": "Drosophila Melanogaster"
+            },
+            {
+                "abbreviation": "hs",
+                "name": "Homo Sapiens"
+            },
+            {
+                "abbreviation": "sc",
+                "name": "Saccharomyces Cerevisiae"
+            }
+        ]
+    }
+}
