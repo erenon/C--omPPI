@@ -48,7 +48,7 @@ TEST_F(ConfigTest, GetNonexistent) {
 
     EXPECT_THROW(
         _config.get<unsigned>("nonexistent"),
-        boost::property_tree::ptree_bad_path
+        std::invalid_argument
     );
 }
 

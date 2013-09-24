@@ -1,5 +1,4 @@
 #include <comppi/service/config/Config.h>
-#include <comppi/service/log/Log.h>
 
 namespace comppi {
 namespace service {
