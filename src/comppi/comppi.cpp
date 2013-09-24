@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include <comppi/service/Container.h>
 #include <comppi/service/config/Config.h>
 
 #include <comppi/entity/SystemType.h>
@@ -23,16 +24,25 @@ int main(int argc, char* argv[]) {
 //
 //        transaction.commit();
 //    }
+    using comppi::service::Container;
+    Container container;
+
+    using comppi::service::config::Config;
 
     {
+        auto config = container.get<Config>();
+
         // read config
-        using comppi::service::config::Config;
-        Config conf;
-        bool status = conf.loadFile("config/config.json");
+        bool status = config->loadFile("config/config.json");
 
         if (!status) {
             return 1;
         }
+    }
+
+    {
+        auto config = container.get<Config>();
+        std::cout << config->get("log.level") << std::endl;
     }
 
 
