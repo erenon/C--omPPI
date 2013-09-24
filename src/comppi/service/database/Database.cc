@@ -1,3 +1,8 @@
+#include <stdexcept>
+
+#include <odb/mysql/exceptions.hxx>
+
+#include <comppi/service/Container.h>
 #include <comppi/service/database/Database.h>
 #include <comppi/service/config/Config.h>
 
@@ -12,9 +17,9 @@ Database::SelfPtr Database::ServiceFactory::create(Container& container) {
         config->get("database.user"),
         config->get("database.password"),
         config->get("database.database"),
-        (const char*)0, // host
+        std::string(""), // host
         0, // port
-        (const char*)0, // socket
+        (std::string*)0, // socket
         config->get("database.charset")
     );
 }

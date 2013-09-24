@@ -7,10 +7,11 @@
 #include <odb/transaction.hxx>
 #include <odb/mysql/database.hxx>
 
-#include <comppi/service/Container.h>
-
 namespace comppi {
 namespace service {
+
+class Container;
+
 namespace database {
 
 typedef std::shared_ptr<odb::mysql::database> DatabasePtr;
