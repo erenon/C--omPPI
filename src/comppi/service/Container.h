@@ -3,6 +3,9 @@
 
 #include <memory>
 #include <type_traits>
+#include <exception>
+
+#include <comppi/service/log/Log.h>
 
 namespace comppi {
 namespace service {
@@ -21,6 +24,11 @@ private:
         enum { value = std::is_class<decltype(test<S>(0))>::value };
     };
 
+    void failure() {
+        ERROR << "Failed to create service, terminating";
+        std::terminate();
+    }
+
 public:
     template<
         typename Service,
@@ -30,8 +38,13 @@ public:
         >::type = 0
     >
     typename Service::SelfPtr get() {
-        static auto servicePtr = Service::ServiceFactory::create(*this);
-        return servicePtr;
+        try {
+            static auto servicePtr = Service::ServiceFactory::create(*this);
+            return servicePtr;
+        } catch (...) {
+            failure();
+            return typename Service::SelfPtr();
+        }
     }
 
     template<
@@ -42,8 +55,13 @@ public:
         >::type = 0
     >
     typename std::shared_ptr<Service> get() {
-        static auto servicePtr = std::make_shared<Service>();
-        return servicePtr;
+        try {
+            static auto servicePtr = std::make_shared<Service>();
+            return servicePtr;
+        } catch (...) {
+            failure();
+            return std::shared_ptr<Service>();
+        }
     }
 };
 
