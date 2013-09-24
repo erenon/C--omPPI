@@ -57,6 +57,13 @@ TEST_F(ConfigTest, Subtree) {
     Config sub(_config.subtree("driver.species"));
 }
 
+TEST_F(ConfigTest, Transformation) {
+    _config.loadFile(configPath() + "testconfig.json");
+    ASSERT_EQ("${comppi_root}/sources/", _config.get("driver.sourcePath"));
+    _config.setTransformation("comppi_root", "/home/comppi");
+    ASSERT_EQ("/home/comppi/sources/", _config.get("driver.sourcePath"));
+}
+
 
 } // namespace config
 } // namespace service

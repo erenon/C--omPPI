@@ -34,6 +34,13 @@ Config Config::subtree(const std::string& key) const {
     return subtree(key.c_str());
 }
 
+void Config::setTransformation(const std::string& from, const std::string& to) {
+    _transformations.push_back(std::make_pair(
+        "${" + from + '}',
+        to
+    ));
+}
+
 Config::Config(const Data& data)
     :_data(data)
 {}
