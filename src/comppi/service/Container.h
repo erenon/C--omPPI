@@ -37,13 +37,13 @@ public:
             int
         >::type = 0
     >
-    typename Service::SelfPtr get() {
+    auto get() -> decltype(Service::ServiceFactory::create(*this)) {
         try {
             static auto servicePtr = Service::ServiceFactory::create(*this);
             return servicePtr;
         } catch (...) {
             failure();
-            return typename Service::SelfPtr();
+            return decltype(Service::ServiceFactory::create(*this))();
         }
     }
 
