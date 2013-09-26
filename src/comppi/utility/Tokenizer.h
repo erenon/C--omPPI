@@ -4,20 +4,21 @@
 #include <array>
 #include <stdexcept>
 #include <iostream>
+#include <sstream>
 
-#include <boost/tokenizer.hpp>
+//#include <boost/tokenizer.hpp>
 
 #include <comppi/service/log/Log.h>
 
 namespace comppi {
 namespace utility {
 
-template<std::size_t FieldCount, std::size_t ReqFieldCount>
+template<std::size_t ReqFieldCount>
 class Tokenizer {
     typedef std::array<std::size_t, ReqFieldCount> FieldIdxArray;
     typedef std::array<std::string, ReqFieldCount> FieldArray;
 public:
-    Tokenizer(std::istream& input, const FieldIdxArray& reqFieldIdxs, const char* delimiter = ",\n")
+    Tokenizer(std::istream& input, const FieldIdxArray& reqFieldIdxs, const char delimiter = ',')
         :_iterator(input, reqFieldIdxs, delimiter)
     {
         throwIfNotAscending(reqFieldIdxs);
@@ -37,18 +38,16 @@ public:
         }
 
         iterator& operator++() {
-            if (_iterator != _tokenizer.end()) {
-                tokenizeLine();
-            }
+            tokenizeLine();
             return *this;
         }
 
         bool operator==(const iterator& rhs) const {
-            return _iterator == rhs._iterator;
+            return _isEnd == rhs._isEnd;
         }
 
         bool operator!=(const iterator& rhs) const {
-            return _iterator != rhs._iterator;
+            return _isEnd != rhs._isEnd;
         }
 
         std::string operator[](std::size_t index) const {
@@ -56,54 +55,62 @@ public:
         }
 
     private:
-        friend class Tokenizer<FieldCount, ReqFieldCount>;
+        friend class Tokenizer<ReqFieldCount>;
 
-        typedef boost::escaped_list_separator<char> TokenizerFunc;
-        typedef std::istreambuf_iterator<char> StreamIterator;
-        typedef boost::tokenizer<TokenizerFunc, StreamIterator> BTokenizer;
-
-        iterator(std::istream& input, const FieldIdxArray& reqFieldIdxs, const char* delimiter)
-            :_tokenizer(
-                StreamIterator(input),
-                StreamIterator(),
-                TokenizerFunc("\\", delimiter, "\"")
-             ),
-             _iterator(_tokenizer.begin()),
-             _reqFieldIdxs(reqFieldIdxs)
-        {
-            tokenizeLine();
-        }
+        iterator(std::istream& input, const FieldIdxArray& reqFieldIdxs, const char delimiter)
+            :_input(input),
+             _reqFieldIdxs(reqFieldIdxs),
+             _delimiter(delimiter),
+             _isEnd(false)
+        {}
 
         iterator end() const {
             iterator end = *this;
-            end._iterator = _tokenizer.end();
+            end._isEnd = true;
             return end;
         }
 
         void tokenizeLine() {
-            std::size_t nextReqFieldIdx(0);
-            std::size_t nextFieldIdxIdx(0);
+            std::string line;
+            std::getline(_input, line);
 
-            for (std::size_t i = 0; i < FieldCount; ++i, ++_iterator) {
-                if (_iterator == _tokenizer.end()) {
-                    ERROR << "Tokenizer: premature end of line " << _currentLine[0];
-                    break;
+            if (_input) {
+                if (line.empty()) {
+                    return tokenizeLine();
+                }
+                std::stringstream lineStream(line);
+                std::string field;
+
+                std::size_t reqFieldIdx(0);
+                std::size_t currentField(0);
+
+                while (
+                    std::getline(lineStream, field, _delimiter)
+                &&  reqFieldIdx < ReqFieldCount
+                ) {
+                    if (currentField == _reqFieldIdxs[reqFieldIdx]) {
+                        _currentLine[reqFieldIdx++] = field;
+                    }
+                    ++currentField;
                 }
 
-                if (nextFieldIdxIdx < ReqFieldCount && i == _reqFieldIdxs[nextFieldIdxIdx]) {
-                    _currentLine[nextReqFieldIdx++] = *_iterator;
-                    ++nextFieldIdxIdx;
+                if (reqFieldIdx != ReqFieldCount) {
+                    ERROR << "Tokenizer: premature end of line";
                 }
+            } else {    // EOF
+                _isEnd = true;
             }
         }
 
-        BTokenizer _tokenizer;
-        BTokenizer::iterator _iterator;
+        std::istream& _input;
         const FieldIdxArray _reqFieldIdxs;
+        const char _delimiter;
+        bool _isEnd;
         FieldArray _currentLine;
     };
 
-    iterator begin() const {
+    iterator begin() {
+        _iterator.tokenizeLine();
         return _iterator;
     }
 
