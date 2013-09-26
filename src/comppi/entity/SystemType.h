@@ -2,6 +2,7 @@
 #define COMPPI_ENTITY_SYSTEMTYPE_H_
 
 #include <string>
+#include <stdexcept>
 
 #include <odb/core.hxx>
 
@@ -14,13 +15,36 @@ public:
     enum ConfidenceType {
         UNKNOWN = 0,
         PREDICTED = 1,
-        EXPERIMENTAL = 2
+        EXPERIMENTAL = 2,
+        GENETIC = 3
     };
 
     SystemType(const std::string& name, ConfidenceType confidenceType)
         :_name(name),
          _confidenceType(confidenceType)
     {}
+
+    SystemType(const std::string& name, int confidenceType)
+        :_name(name)
+    {
+        switch(confidenceType) {
+        case UNKNOWN:
+            _confidenceType = UNKNOWN;
+            break;
+        case PREDICTED:
+            _confidenceType = PREDICTED;
+            break;
+        case EXPERIMENTAL:
+            _confidenceType = EXPERIMENTAL;
+            break;
+        case GENETIC:
+            _confidenceType = GENETIC;
+            break;
+        default:
+            throw std::invalid_argument("SystemType: Invalid confidence type");
+            break;
+        }
+    }
 
     // GETTERS
 
