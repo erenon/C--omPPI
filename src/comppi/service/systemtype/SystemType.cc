@@ -42,6 +42,12 @@ bool SystemType::loadDatabase() {
     INFO << "Load SystemTypes from: " << _systemPath;
 
     std::fstream input(_systemPath.c_str(), std::fstream::in);
+
+    if (!input) {
+        ERROR << "Failed to open systems file";
+        return false;
+    }
+
     utility::Tokenizer<2> tokenizer(input, {{0, 1}}, ';');
 
     {
