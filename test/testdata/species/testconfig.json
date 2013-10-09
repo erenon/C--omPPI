@@ -1,0 +1,22 @@
+{
+    "barbaz" : 123,
+    "species": [
+        {
+            "abbr": "hs",
+            "name": "Homo sapiens" 
+        },
+        {
+            "abbr": "dm",
+            "name": "Drosophila melanogaster" 
+        },
+        {
+            "abbr": "ce",
+            "name": "Caenorhabditis elegans" 
+        },
+        {
+            "abbr": "sc",
+            "name": "Saccharomyces cerevisiae" 
+        }
+    ],
+    "foobar" : {}
+}
