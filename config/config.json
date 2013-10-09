@@ -20,6 +20,25 @@
         "synonym": "${comppi_root}/sources/systemtype/synonym.csv"
     },
     
+    "species": [
+        {
+            "abbr": "ce",
+            "name": "Caenorhabditis elegans" 
+        },
+        {
+            "abbr": "dm",
+            "name": "Drosophila melanogaster" 
+        },
+        {
+            "abbr": "hs",
+            "name": "Homo sapiens" 
+        },
+        {
+            "abbr": "sc",
+            "name": "Saccharomyces cerevisiae" 
+        }
+    ],
+    
     "driver": {
         "sourcePath": "${comppi_root}/sources/",
         "species": [
