@@ -1,6 +1,7 @@
 {
     "answer" : 42,
     "name" : "foobar",
+    "array": ["first", "second", "third"],
     "driver": {
         "sourcePath": "${comppi_root}/sources/",
         "species": [

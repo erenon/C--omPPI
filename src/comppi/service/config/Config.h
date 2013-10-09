@@ -17,6 +17,8 @@ namespace service {
 namespace config {
 
 class Config {
+private:
+    typedef boost::property_tree::ptree Data;
 public:
     Config() {}
     bool loadFile(const std::string& fileName);
@@ -57,8 +59,27 @@ public:
 
     void setTransformation(const std::string& from, const std::string& to);
 
+    class iterator :public Data::const_iterator {
+    public:
+        iterator(const Data::const_iterator& it)
+            :Data::const_iterator(it)
+        {}
+
+        Config operator*() {
+            return Config(((Data::const_iterator)*this)->second);
+        }
+    };
+
+    iterator begin() const {
+        return iterator(_data.begin());
+    }
+
+    iterator end() const {
+        return iterator(_data.end());
+    }
+
 private:
-    typedef boost::property_tree::ptree Data;
+    friend class iterator;
 
     Config(const Data& data);
 

@@ -64,6 +64,18 @@ TEST_F(ConfigTest, Transformation) {
     ASSERT_EQ("/home/comppi/sources/", _config.get("driver.sourcePath"));
 }
 
+TEST_F(ConfigTest, Iterator) {
+    _config.loadFile(configPath() + "testconfig.json");
+    Config sub(_config.subtree("array"));
+
+    std::string values[3] = {"first", "second", "third"};
+
+    int i = 0;
+    for (auto it : sub) {
+        EXPECT_EQ(values[i++], it.get(""));
+    }
+}
+
 
 } // namespace config
 } // namespace service
