@@ -1,5 +1,5 @@
-#ifndef COMPPI_ENTITY__PROTEINNAMEMAP_H_
-#define COMPPI_ENTITY__PROTEINNAMEMAP_H_
+#ifndef COMPPI_ENTITY_PROTEINNAMEMAP_H_
+#define COMPPI_ENTITY_PROTEINNAMEMAP_H_
 
 #include <string>
 
@@ -13,6 +13,8 @@ namespace entity {
 #pragma db object
 class ProteinNameMap {
 public:
+    ProteinNameMap() {}
+
     ProteinNameMap(
         const Species& species,
         const std::string& namingConventionA,
@@ -27,10 +29,48 @@ public:
         _proteinNameB(proteinNameB)
     {}
 
+    int getSpecieId() const {
+        return _specieId;
+    }
+
+    std::string getNamingConventionA() const {
+        return _namingConventionA;
+    }
+
+    std::string getProteinNameA() const {
+        return _proteinNameA;
+    }
+
+    std::string getNamingConventionB() const {
+        return _namingConventionB;
+    }
+
+    std::string getProteinNameB() const {
+        return _proteinNameB;
+    }
+
+    void setSpecie(const Species& species) {
+        _specieId = species.id;
+    }
+
+    void setNamingConventionA(const std::string& namingConventionA) {
+        _namingConventionA = namingConventionA;
+    }
+
+    void setProteinNameA(const std::string& proteinNameA) {
+        _proteinNameA = proteinNameA;
+    }
+
+    void setNamingConventionB(const std::string& namingConventionB) {
+        _namingConventionB = namingConventionB;
+    }
+
+    void setProteinNameB(const std::string& proteinNameB) {
+        _proteinNameB = proteinNameB;
+    }
+
 private:
     friend class odb::access;
-
-    ProteinNameMap() {}
 
     #pragma db id auto
     unsigned _id;
@@ -39,9 +79,12 @@ private:
     std::string _proteinNameA;
     std::string _namingConventionB;
     std::string _proteinNameB;
+public:
+
+
 };
 
 } // namespace entity
 } // namespace comppi
 
-#endif  // COMPPI_ENTITY__PROTEINNAMEMAP_H_
+#endif  // COMPPI_ENTITY_PROTEINNAMEMAP_H_
