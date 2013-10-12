@@ -9,19 +9,22 @@ namespace map {
 
 Biogrid::Biogrid(std::fstream& input, config::Config config)
     :_tokenizer(input, {{0, 1, 2}}, '\t')
-{}
+{
+    _speciesId = config.get<int>("speciesId");
+}
 
 Biogrid::iterator Biogrid::begin() {
-    return iterator(_tokenizer.begin(), _tokenizer.end());
+    return iterator(_tokenizer.begin(), _tokenizer.end(), _speciesId);
 }
 
 Biogrid::iterator Biogrid::end() {
     return iterator(_tokenizer.end());
 }
 
-Biogrid::iterator::iterator(const TokenIterator it, const TokenIterator end)
+Biogrid::iterator::iterator(const TokenIterator it, const TokenIterator end, int speciesId)
     :_it(it),
-     _end(end)
+     _end(end),
+     _speciesId(speciesId)
 {
     ++(*this);
 }
@@ -78,9 +81,18 @@ Biogrid::iterator& Biogrid::iterator::operator++() {
 
             translation.setProteinNameA(
                 strongestTranslation.getProteinNameB());
+
+            translation.setSpeciesId(_speciesId);
         }
 
-        // TODO remove translations with ConventionB == strongestConv
+        _buffer.erase(std::remove_if(
+            _buffer.begin(),
+            _buffer.end(),
+            [](const entity::ProteinNameMap& translation) {
+                return translation.getNamingConventionA()
+                    == translation.getNamingConventionB();
+            }
+        ), _buffer.end());
     } else {
         _buffer.clear();
 

@@ -23,7 +23,7 @@ public:
 
     class iterator {
     public:
-        iterator(const TokenIterator it, const TokenIterator end);
+        iterator(const TokenIterator it, const TokenIterator end, int speciesId);
         iterator(const TokenIterator end);
         iterator& operator++();
         entity::ProteinNameMap operator*();
@@ -36,6 +36,7 @@ public:
 
         TokenIterator _it;
         TokenIterator _end;
+        int _speciesId;
         std::deque<entity::ProteinNameMap> _buffer;
     };
 
@@ -44,6 +45,7 @@ public:
 
 private:
     Tokenizer _tokenizer;
+    int _speciesId;
 };
 
 } // namespace map
