@@ -49,6 +49,11 @@ public:
         }
     }
 
+    template<typename Key, typename Value>
+    void set(Key key, Value value) {
+        _data.put(key, value);
+    }
+
     template<typename Value>
     inline Value transform(const Value& value) const {
         return value;

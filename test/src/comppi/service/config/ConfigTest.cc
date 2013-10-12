@@ -52,6 +52,11 @@ TEST_F(ConfigTest, GetNonexistent) {
     );
 }
 
+TEST_F(ConfigTest, Set) {
+    _config.set("foo.bar", 123);
+    ASSERT_EQ(123, _config.get<int>("foo.bar"));
+}
+
 TEST_F(ConfigTest, Subtree) {
     _config.loadFile(configPath() + "testconfig.json");
     Config sub(_config.subtree("driver.species"));
