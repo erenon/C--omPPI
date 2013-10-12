@@ -5,8 +5,6 @@
 
 #include <odb/core.hxx>
 
-#include <comppi/entity/Species.h>
-
 namespace comppi {
 namespace entity {
 
@@ -16,20 +14,20 @@ public:
     ProteinNameMap() {}
 
     ProteinNameMap(
-        const Species& species,
+        const int speciesId,
         const std::string& namingConventionA,
         const std::string& proteinNameA,
         const std::string& namingConventionB,
         const std::string& proteinNameB
     )
-       :_specieId(species.id),
+       :_specieId(speciesId),
         _namingConventionA(namingConventionA),
         _proteinNameA(proteinNameA),
         _namingConventionB(namingConventionB),
         _proteinNameB(proteinNameB)
     {}
 
-    int getSpecieId() const {
+    int getSpeciesId() const {
         return _specieId;
     }
 
@@ -49,8 +47,8 @@ public:
         return _proteinNameB;
     }
 
-    void setSpecie(const Species& species) {
-        _specieId = species.id;
+    void setSpeciesId(const int speciesId) {
+        _specieId = speciesId;
     }
 
     void setNamingConventionA(const std::string& namingConventionA) {
