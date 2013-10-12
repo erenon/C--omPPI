@@ -1,0 +1,8 @@
+{
+    "ce_biogrid": {
+    	"speciesAbbr": "ce",
+        "file": "ce_biogrid/BIOGRID-IDENTIFIERS-3.1.92.tab.txt",
+        "driver": "Biogrid",
+        "driverOptions": {}
+    }
+}

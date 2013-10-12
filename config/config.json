@@ -41,23 +41,8 @@
     
     "driver": {
         "sourcePath": "${comppi_root}/sources/",
-        "species": [
-            {
-                "abbreviation": "ce",
-                "name": "Caenorhabditis Elegans"
-            },
-            {
-                "abbreviation": "dm",
-                "name": "Drosophila Melanogaster"
-            },
-            {
-                "abbreviation": "hs",
-                "name": "Homo Sapiens"
-            },
-            {
-                "abbreviation": "sc",
-                "name": "Saccharomyces Cerevisiae"
-            }
-        ]
+        "mapDir": "map/",
+        "localizationDir": "localization/",
+        "interactionDir": "interaction/"
     }
 }
