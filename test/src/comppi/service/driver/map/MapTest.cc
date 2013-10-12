@@ -5,8 +5,12 @@
 
 #include <gtest/gtest.h>
 
+#include <boost/lexical_cast.hpp>
+
 #include <comppi/service/config/Config.h>
 #include <comppi/service/driver/map/Biogrid.h>
+
+#include <comppi/utility/Tokenizer.h>
 
 namespace comppi {
 namespace service {
@@ -21,28 +25,41 @@ public:
 
         if (expected) {
             compare(map, expected);
+            expected.close();
         } else {
             std::fstream actual(expectedCsvFile.c_str(), std::fstream::out);
 
             write(map, actual);
+
+            actual.close();
         }
     }
 
 private:
-    void compare(Map& map, std::fstream& expected) {
-        // TODO implement diff here
+    void compare(Map& map, std::fstream& expectedCsv) {
+    	utility::Tokenizer<5> expected(expectedCsv, {{0,1,2,3,4}}, ';');
+    	auto expectedIt = expected.begin();
+
+        for (auto translation : map) {
+        	EXPECT_EQ(boost::lexical_cast<int>(expectedIt[0]), translation.getSpeciesId());
+        	EXPECT_EQ(expectedIt[1], translation.getNamingConventionA());
+        	EXPECT_EQ(expectedIt[2], translation.getProteinNameA());
+        	EXPECT_EQ(expectedIt[3], translation.getNamingConventionB());
+        	EXPECT_EQ(expectedIt[4], translation.getProteinNameB());
+
+        	++expectedIt;
+        }
     }
 
     void write(Map& map, std::fstream& output) {
         for (auto translation : map) {
-            output << translation.getNamingConventionA() << ";"
+            output << translation.getSpeciesId() << ";"
+            	   << translation.getNamingConventionA() << ";"
                    << translation.getProteinNameA() << ";"
                    << translation.getNamingConventionB() << ";"
                    << translation.getProteinNameB()
                    << std::endl;
         }
-
-        output.close();
     }
 };
 
@@ -65,6 +82,7 @@ protected:
 
 TEST_F(BiogridTest, TestRead) {
     config::Config config{};
+    config.set("speciesId", 0);
 
     std::fstream input((dataPath() + "biogrid/input").c_str(), std::ios::in);
     std::string outputPath = dataPath() + "biogrid/output";
