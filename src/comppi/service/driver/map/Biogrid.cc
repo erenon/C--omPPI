@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cstring>
 
 #include <comppi/service/driver/map/Biogrid.h>
 
@@ -11,6 +12,16 @@ Biogrid::Biogrid(std::fstream& input, config::Config config)
     :_tokenizer(input, {{0, 1, 2}}, '\t')
 {
     _speciesId = config.get<int>("speciesId");
+
+    // skip header
+    const char* firstColumnHeader = "BIOGRID_ID";
+    std::string line;
+    do {
+        std::getline(input, line);
+    } while (
+        line.substr(0, strlen(firstColumnHeader)) != firstColumnHeader
+    &&  input.eof() == false
+    );
 }
 
 Biogrid::iterator Biogrid::begin() {
@@ -35,69 +46,61 @@ Biogrid::iterator::iterator(const TokenIterator end)
 {}
 
 Biogrid::iterator& Biogrid::iterator::operator++() {
-    // if buffer !empty, return
-    if (_buffer.empty() == false) {
-        return *this;
-    }
+    while (_buffer.empty() && _it != _end) {
 
-    int strongestOrder = -1;
-    entity::ProteinNameMap strongestTranslation;
+        int strongestOrder = -1;
+        entity::ProteinNameMap strongestTranslation;
 
-    for (std::string id = _it[0];
-        id == _it[0] && _it != _end;
-        ++_it
-    ) {
+        for (std::string id = _it[0];
+            id == _it[0] && _it != _end;
+            ++_it
+        ) {
+            // get naming convention <id, normalizedName>
+            Convention convention = getConvention(_it[2]);
 
-        // get naming convention <id, normalizedName>
-        Convention convention = getConvention(_it[2]);
-
-        // if id < 0, continue
-        if (convention.first < 0) {
-            continue;
-        }
-
-        entity::ProteinNameMap translation;
-        translation.setNamingConventionB(convention.second);
-        translation.setProteinNameB(_it[1]);
-
-        if (strongestOrder == -1) {
-            strongestTranslation = translation;
-            strongestOrder = convention.first;
-        } else if (convention.first > strongestOrder) {
-            // put prev strongest into buffer
-            std::swap(strongestTranslation, translation);
-            strongestOrder = convention.first;
-
-            _buffer.push_back(translation);
-        } else {
-            _buffer.push_back(translation);
-        }
-    }
-
-    if (strongestOrder >= 0) {
-        for (auto& translation : _buffer) {
-            translation.setNamingConventionA(
-                strongestTranslation.getNamingConventionB());
-
-            translation.setProteinNameA(
-                strongestTranslation.getProteinNameB());
-
-            translation.setSpeciesId(_speciesId);
-        }
-
-        _buffer.erase(std::remove_if(
-            _buffer.begin(),
-            _buffer.end(),
-            [](const entity::ProteinNameMap& translation) {
-                return translation.getNamingConventionA()
-                    == translation.getNamingConventionB();
+            // if id < 0, continue
+            if (convention.first < 0) {
+                continue;
             }
-        ), _buffer.end());
-    } else {
-        _buffer.clear();
 
-        if (_it != _end) {
-            ++(*this);
+            entity::ProteinNameMap translation;
+            translation.setNamingConventionB(convention.second);
+            translation.setProteinNameB(_it[1]);
+
+            if (strongestOrder == -1) {
+                strongestTranslation = translation;
+                strongestOrder = convention.first;
+            } else if (convention.first > strongestOrder) {
+                // put prev strongest into buffer
+                std::swap(strongestTranslation, translation);
+                strongestOrder = convention.first;
+
+                _buffer.push_back(translation);
+            } else {
+                _buffer.push_back(translation);
+            }
+        }
+
+        //if (strongestOrder >= 0) {
+        if (!_buffer.empty()) {
+            for (auto& translation : _buffer) {
+                translation.setNamingConventionA(
+                    strongestTranslation.getNamingConventionB());
+
+                translation.setProteinNameA(
+                    strongestTranslation.getProteinNameB());
+
+                translation.setSpeciesId(_speciesId);
+            }
+
+            _buffer.erase(std::remove_if(
+                _buffer.begin(),
+                _buffer.end(),
+                [](const entity::ProteinNameMap& translation) {
+                    return translation.getNamingConventionA()
+                        == translation.getNamingConventionB();
+                }
+            ), _buffer.end());
         }
     }
 
