@@ -71,6 +71,8 @@ int Map::build(const service::config::Config& mapConfig) {
         );
     } catch (const std::invalid_argument&) {
         ERROR << "Invalid source configuration, missing mandatory 'speciesAbbr' key.";
+    } catch (const std::out_of_range&) {
+        ERROR << "Invalid source configuration, invalid 'speciesAbbr' key.";
     }
 
     try {
