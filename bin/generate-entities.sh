@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# TODO generate single SQL file:
+# odb ... --generate-schema-only --at-once --input-name company position.hxx employee.hxx
+
+# TODO generate uncommented fkeys:
+# --fkeys-deferrable-mode not_deferrable <- unrecognized switch
+
+# TODO review odb options (e.g: --omit-*)
+
 echo "Generate ODB entities"
 
 for input in $@; do
