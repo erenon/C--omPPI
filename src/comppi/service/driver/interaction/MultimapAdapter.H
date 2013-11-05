@@ -70,8 +70,15 @@ public:
                 for (auto translatedB : translatedBs) {
                     entity::Interaction tInteraction(interaction);
 
-                    tInteraction.setActorA(std::make_shared<entity::Protein>(translatedA));
-                    tInteraction.setActorB(std::make_shared<entity::Protein>(translatedB));
+                    auto actorA = std::make_shared<entity::Protein>(translatedA);
+                    auto actorB = std::make_shared<entity::Protein>(translatedB);
+
+                    if (actorB->getId() < actorA->getId()) {
+                        actorA.swap(actorB);
+                    }
+
+                    tInteraction.setActorA(actorA);
+                    tInteraction.setActorB(actorB);
 
                     _buffer.push_back(tInteraction);
                 }
