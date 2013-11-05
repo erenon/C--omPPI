@@ -5,6 +5,7 @@
 #include <comppi/service/log/Log.h>
 #include <comppi/service/species/Species.h>
 #include <comppi/service/database/Inserter.h>
+#include <comppi/service/driver/SystemTypeAdapter.H>
 #include <comppi/service/driver/interaction/MultimapAdapter.H>
 
 #include <comppi/entity/gen/Interaction-odb.hxx>
@@ -90,6 +91,7 @@ int Interaction::build(const Config& interactionConfig) {
 
     INFO << "Build interaction source: '" << filePath << "'";
 
+    using service::driver::SystemTypeAdapter;
     using service::driver::interaction::MultimapAdapter;
 
     if (driverName == "Biogrid") {
@@ -97,10 +99,12 @@ int Interaction::build(const Config& interactionConfig) {
 
         try {
             Biogrid driver(input, driverConfig);
-            MultimapAdapter<Biogrid> multimap(_container, driver);
+            SystemTypeAdapter<Biogrid> stadapter(_container, driver);
+            MultimapAdapter<SystemTypeAdapter<Biogrid>> multimap(_container, stadapter);
 
             auto inserterPtr = _container.get<service::database::Inserter<
-                MultimapAdapter<Biogrid>>>();
+                MultimapAdapter<SystemTypeAdapter<Biogrid>>
+            >>();
             inserterPtr->insert(multimap);
         } catch (const std::invalid_argument&) {
             ERROR << "Invalid driver configuration";
