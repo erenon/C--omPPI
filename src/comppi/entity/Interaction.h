@@ -3,6 +3,7 @@
 
 #include <string>
 #include <memory>
+#include <vector>
 
 #include <odb/core.hxx>
 
@@ -10,6 +11,8 @@
 
 namespace comppi {
 namespace entity {
+
+class SystemType;
 
 #pragma db object
 class Interaction {
@@ -20,7 +23,8 @@ public:
         const std::string& sourceDb,
         const int pubmedId
     )
-        :_actorA(actorA),
+        :_id(0),
+         _actorA(actorA),
          _actorB(actorB),
          _sourceDb(sourceDb),
          _pubmedId(pubmedId)
@@ -62,6 +66,17 @@ public:
         _pubmedId = pubmedId;
     }
 
+    void addSystemType(const std::shared_ptr<SystemType>& systemType) {
+        _systemTypes.push_back(systemType);
+    }
+
+    std::pair<
+        std::vector<std::shared_ptr<SystemType>>::iterator,
+        std::vector<std::shared_ptr<SystemType>>::iterator
+    >
+    getSystemTypes() {
+        return std::make_pair(_systemTypes.begin(), _systemTypes.end());
+    }
 private:
     friend class odb::access;
 
@@ -78,9 +93,19 @@ private:
 
     std::string _sourceDb;
     int _pubmedId;
+
+    #pragma db value_not_null unordered \
+        table("InteractionToSystemType") \
+        id_column("interactionId") \
+        value_column("systemTypeId")
+    std::vector<std::shared_ptr<SystemType>> _systemTypes;
 };
 
 } // namespace entity
 } // namespace comppi
+
+#ifdef ODB_COMPILER
+    #include <comppi/entity/SystemType.h>
+#endif
 
 #endif // COMPPI_ENTITY_INTERACTION_H_

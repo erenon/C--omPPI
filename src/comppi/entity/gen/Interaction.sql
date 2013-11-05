@@ -2,6 +2,8 @@
  * compiler for C++.
  */
 
+DROP TABLE IF EXISTS `InteractionToSystemType`;
+
 DROP TABLE IF EXISTS `Interaction`;
 
 CREATE TABLE `Interaction` (
@@ -11,6 +13,19 @@ CREATE TABLE `Interaction` (
   `sourceDb` TEXT NOT NULL,
   `pubmedId` INT NOT NULL)
  ENGINE=InnoDB;
+
+CREATE TABLE `InteractionToSystemType` (
+  `interactionId` INT UNSIGNED NOT NULL,
+  `systemTypeId` INT UNSIGNED NOT NULL,
+
+  CONSTRAINT `InteractionToSystemType_interactionId_fk`
+    FOREIGN KEY (`interactionId`)
+    REFERENCES `Interaction` (`id`)
+    ON DELETE CASCADE)
+ ENGINE=InnoDB;
+
+CREATE INDEX `interactionId_i`
+  ON `InteractionToSystemType` (`interactionId`);
 
 /*
 ALTER TABLE `Interaction` ADD
@@ -24,5 +39,12 @@ ALTER TABLE `Interaction` ADD
   CONSTRAINT `Interaction_actorBId_fk`
     FOREIGN KEY (`actorBId`)
     REFERENCES `Protein` (`id`)
+*/
+
+/*
+ALTER TABLE `InteractionToSystemType` ADD
+  CONSTRAINT `InteractionToSystemType_systemTypeId_fk`
+    FOREIGN KEY (`systemTypeId`)
+    REFERENCES `SystemType` (`id`)
 */
 

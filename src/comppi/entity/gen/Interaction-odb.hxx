@@ -223,6 +223,74 @@ namespace odb
       std::size_t version;
     };
 
+    // _systemTypes
+    //
+    struct systemTypes_traits
+    {
+      static const std::size_t id_column_count = 1UL;
+      static const std::size_t data_column_count = 2UL;
+
+      static const char insert_statement[];
+      static const char select_statement[];
+      static const char delete_statement[];
+
+      typedef ::std::vector< ::std::shared_ptr< ::comppi::entity::SystemType > > container_type;
+      typedef
+      odb::access::container_traits<container_type>
+      container_traits_type;
+      typedef container_traits_type::index_type index_type;
+      typedef container_traits_type::value_type value_type;
+
+      typedef ordered_functions<index_type, value_type> functions_type;
+      typedef mysql::container_statements< systemTypes_traits > statements_type;
+
+      struct data_image_type
+      {
+        // value
+        //
+        unsigned int value_value;
+        my_bool value_null;
+
+        std::size_t version;
+      };
+
+      static void
+      bind (MYSQL_BIND*,
+            const MYSQL_BIND* id,
+            std::size_t id_size,
+            data_image_type&);
+
+      static void
+      grow (data_image_type&, my_bool*);
+
+      static void
+      init (data_image_type&, const value_type&);
+
+      static void
+      init (value_type&, const data_image_type&, database*);
+
+      static void
+      insert (index_type, const value_type&, void*);
+
+      static bool
+      select (index_type&, value_type&, void*);
+
+      static void
+      delete_ (void*);
+
+      static void
+      persist (const container_type&, statements_type&);
+
+      static void
+      load (container_type&, statements_type&);
+
+      static void
+      update (const container_type&, statements_type&);
+
+      static void
+      erase (statements_type&);
+    };
+
     struct actorA_tag;
     struct actorB_tag;
 

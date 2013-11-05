@@ -5,6 +5,8 @@
 #include <odb/pre.hxx>
 
 #include <comppi/entity/gen/SystemType-odb.hxx>
+#include <comppi/entity/gen/Interaction-odb.hxx>
+#include <comppi/entity/gen/Protein-odb.hxx>
 
 #include <cassert>
 #include <cstring>  // std::memcpy
@@ -26,6 +28,143 @@ namespace odb
 {
   // SystemType
   //
+
+  // _interactions
+  //
+
+  const char access::object_traits_impl< ::comppi::entity::SystemType, id_mysql >::interactions_traits::
+  select_statement[] =
+  "SELECT "
+  "`InteractionToSystemType`.`interactionId`"
+  " FROM `InteractionToSystemType`"
+  " WHERE `InteractionToSystemType`.`systemTypeId`=?";
+
+  const char access::object_traits_impl< ::comppi::entity::SystemType, id_mysql >::interactions_traits::
+  insert_statement[] =
+  "";
+
+  const char access::object_traits_impl< ::comppi::entity::SystemType, id_mysql >::interactions_traits::
+  delete_statement[] =
+  "";
+
+  void access::object_traits_impl< ::comppi::entity::SystemType, id_mysql >::interactions_traits::
+  bind (MYSQL_BIND* b,
+        const MYSQL_BIND* id,
+        std::size_t id_size,
+        data_image_type& d)
+  {
+    using namespace mysql;
+
+    statement_kind sk (statement_select);
+    ODB_POTENTIALLY_UNUSED (sk);
+
+    size_t n (0);
+
+    // object_id
+    //
+    if (id != 0)
+      std::memcpy (&b[n], id, id_size * sizeof (id[0]));
+    n += id_size;
+
+    // value
+    //
+    b[n].buffer_type = MYSQL_TYPE_LONG;
+    b[n].is_unsigned = 1;
+    b[n].buffer = &d.value_value;
+    b[n].is_null = &d.value_null;
+  }
+
+  void access::object_traits_impl< ::comppi::entity::SystemType, id_mysql >::interactions_traits::
+  grow (data_image_type& i, my_bool* t)
+  {
+    bool grew (false);
+
+    // value
+    //
+    t[0UL] = 0;
+
+    if (grew)
+      i.version++;
+  }
+
+  void access::object_traits_impl< ::comppi::entity::SystemType, id_mysql >::interactions_traits::
+  init (value_type& v, const data_image_type& i, database* db)
+  {
+    ODB_POTENTIALLY_UNUSED (db);
+
+    // value
+    //
+    {
+      typedef object_traits< ::comppi::entity::Interaction > obj_traits;
+      typedef odb::pointer_traits< value_type > ptr_traits;
+
+      if (i.value_null)
+        throw null_pointer ();
+      else
+      {
+        obj_traits::id_type id;
+        mysql::value_traits<
+            obj_traits::id_type,
+            mysql::id_ulong >::set_value (
+          id,
+          i.value_value,
+          i.value_null);
+
+        v = ptr_traits::pointer_type (
+          *static_cast<mysql::database*> (db), id);
+      }
+    }
+  }
+
+  void access::object_traits_impl< ::comppi::entity::SystemType, id_mysql >::interactions_traits::
+  insert (index_type, const value_type&, void*)
+  {
+  }
+
+  bool access::object_traits_impl< ::comppi::entity::SystemType, id_mysql >::interactions_traits::
+  select (index_type&, value_type& v, void* d)
+  {
+    using namespace mysql;
+    using mysql::select_statement;
+
+    statements_type& sts (*static_cast< statements_type* > (d));
+    data_image_type& di (sts.data_image ());
+    init (v, di, &sts.connection ().database ());
+
+    select_statement& st (sts.select_statement ());
+    select_statement::result r (st.fetch ());
+    return r != select_statement::no_data;
+  }
+
+  void access::object_traits_impl< ::comppi::entity::SystemType, id_mysql >::interactions_traits::
+  delete_ (void*)
+  {
+  }
+
+  void access::object_traits_impl< ::comppi::entity::SystemType, id_mysql >::interactions_traits::
+  load (container_type& c, statements_type& sts)
+  {
+    using namespace mysql;
+    using mysql::select_statement;
+
+    const binding& id (sts.id_binding ());
+
+    if (sts.data_binding_test_version ())
+    {
+      bind (sts.data_bind (), id.bind, id.count, sts.data_image ());
+      sts.data_binding_update_version ();
+    }
+
+    select_statement& st (sts.select_statement ());
+    st.execute ();
+    auto_result ar (st);
+    select_statement::result r (st.fetch ());
+    bool more (r != select_statement::no_data);
+
+    functions_type& fs (sts.functions ());
+    fs.ordered_ = false;
+    container_traits_type::load (c, more, fs);
+  }
 
   access::object_traits_impl< ::comppi::entity::SystemType, id_mysql >::id_type
   access::object_traits_impl< ::comppi::entity::SystemType, id_mysql >::
@@ -255,9 +394,12 @@ namespace odb
 
   struct access::object_traits_impl< ::comppi::entity::SystemType, id_mysql >::container_statement_cache_type
   {
+    mysql::container_statements_impl< interactions_traits > _interactions;
+
     container_statement_cache_type (
-      mysql::connection&,
-      mysql::binding&)
+      mysql::connection& c,
+      mysql::binding& id)
+    : _interactions (c, id)
     {
     }
   };
@@ -597,6 +739,21 @@ namespace odb
     }
 
     return r != select_statement::no_data;
+  }
+
+  void access::object_traits_impl< ::comppi::entity::SystemType, id_mysql >::
+  load_ (statements_type& sts, object_type& obj)
+  {
+    // _interactions
+    //
+    {
+      ::std::vector< ::odb::lazy_weak_ptr< ::comppi::entity::Interaction > >& v =
+        obj._interactions;
+
+      interactions_traits::load (
+        v,
+        sts.container_statment_cache ()._interactions);
+    }
   }
 
   result< access::object_traits_impl< ::comppi::entity::SystemType, id_mysql >::object_type >

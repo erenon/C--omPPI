@@ -47,11 +47,5 @@ namespace odb
     erase (db, id (obj));
     callback (db, obj, callback_event::post_erase);
   }
-
-  inline
-  void access::object_traits_impl< ::comppi::entity::Interaction, id_mysql >::
-  load_ (statements_type&, object_type&)
-  {
-  }
 }
 

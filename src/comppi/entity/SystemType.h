@@ -3,11 +3,16 @@
 
 #include <string>
 #include <stdexcept>
+#include <memory>
+#include <vector>
 
 #include <odb/core.hxx>
+#include <odb/lazy-ptr.hxx>
 
 namespace comppi {
 namespace entity {
+
+class Interaction;
 
 #pragma db object
 class SystemType {
@@ -20,12 +25,14 @@ public:
     };
 
     SystemType(const std::string& name, ConfidenceType confidenceType)
-        :_name(name),
+        :_id(0),
+         _name(name),
          _confidenceType(confidenceType)
     {}
 
     SystemType(const std::string& name, int confidenceType)
-        :_name(name)
+        :_id(0),
+         _name(name)
     {
         switch(confidenceType) {
         case UNKNOWN:
@@ -79,9 +86,16 @@ private:
     unsigned _id;
     std::string _name;
     int _confidenceType;
+
+    #pragma db value_not_null inverse(_systemTypes)
+    std::vector<odb::lazy_weak_ptr<Interaction>> _interactions;
 };
 
 } // namespace entity
 } // namespace comppi
+
+#ifdef ODB_COMPILER
+    #include <comppi/entity/Interaction.h>
+#endif
 
 #endif  // COMPPI_ENTITY_SYSTEMTYPE_H_
