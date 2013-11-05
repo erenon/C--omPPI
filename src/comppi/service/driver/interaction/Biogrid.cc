@@ -4,6 +4,7 @@
 #include <comppi/service/driver/interaction/Biogrid.h>
 
 #include <comppi/entity/Protein.h>
+#include <comppi/entity/SystemType.h>
 
 #include <comppi/service/config/Config.h>
 
@@ -43,7 +44,7 @@ Biogrid::iterator& Biogrid::iterator::operator++() {
 }
 
 entity::Interaction Biogrid::iterator::operator*() const {
-    return entity::Interaction(
+    auto interaction = entity::Interaction(
         std::make_shared<entity::Protein>(
             _speciesId,
             _it[0],
@@ -57,6 +58,10 @@ entity::Interaction Biogrid::iterator::operator*() const {
         "Biogrid",
         std::atoi(_it[3].c_str())
     );
+
+    interaction.addSystemType(std::make_shared<entity::SystemType>(_it[2], 0));
+
+    return interaction;
 }
 
 bool Biogrid::iterator::operator==(const iterator& rhs) const {
