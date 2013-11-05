@@ -3,11 +3,18 @@
 
 #include <memory>
 #include <string>
+#include <map>
+#include <vector>
 
 #include <comppi/service/Container.h>
 #include <comppi/service/database/Database.h>
 
 namespace comppi {
+
+namespace entity {
+    class SystemType;
+} // namespace entity
+
 namespace service {
 namespace systemtype {
 
@@ -27,10 +34,15 @@ public:
 
     bool loadDatabase();
 
+    entity::SystemType getSystemType(const std::string& name);
+
 private:
+    bool loadSynonyms();
+
     const std::string _systemPath;
     const std::string _synonymPath;
     database::DatabasePtr _databasePtr;
+    std::map<std::string, std::string> _synonyms;
 };
 
 } // namespace systemtype

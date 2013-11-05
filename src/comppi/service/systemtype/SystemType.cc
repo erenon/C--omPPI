@@ -1,5 +1,6 @@
 #include <fstream>
 #include <stdexcept>
+#include <sstream>
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/trim.hpp>
@@ -36,7 +37,9 @@ SystemType::SystemType(
     :_systemPath(systemPath),
      _synonymPath(synonymPath),
      _databasePtr(databasePtr)
-{}
+{
+    loadSynonyms();
+}
 
 bool SystemType::loadDatabase() {
     INFO << "Load SystemTypes from: " << _systemPath;
@@ -79,6 +82,67 @@ bool SystemType::loadDatabase() {
         }
 
         transaction.commit();
+    }
+
+    input.close();
+
+    return true;
+}
+
+entity::SystemType SystemType::getSystemType(const std::string& name) {
+    typedef odb::query<entity::SystemType> Query;
+    typedef odb::result<entity::SystemType> Result;
+    using comppi::service::database::Transaction;
+
+    // TODO use prepared query
+    Query qSystemType(Query::name == name);
+
+    Transaction transaction(_databasePtr->begin());
+
+    Result rSystemType(_databasePtr->query<entity::SystemType>(qSystemType));
+
+    if (!rSystemType.empty()) {
+        auto systemType = *rSystemType.begin();
+        transaction.commit();
+
+        return systemType;
+    } else {
+        entity::SystemType systemType(name, entity::SystemType::UNKNOWN);
+        _databasePtr->persist(systemType);
+        transaction.commit();
+        return systemType;
+    }
+}
+
+bool SystemType::loadSynonyms() {
+    INFO << "Load SystemType synonyms from: " << _synonymPath;
+
+    std::fstream input(_synonymPath.c_str(), std::fstream::in);
+
+    if (!input) {
+        ERROR << "Failed to open synonyms file";
+        return false;
+    }
+
+    while (input) {
+        std::string line;
+        std::getline(input, line, '\n');
+
+        std::stringstream lineStream(line);
+        std::string mainName;
+        std::getline(lineStream, mainName, ';');
+
+        while (lineStream) {
+            std::string synonym;
+            std::getline(lineStream, synonym, ';');
+
+            boost::trim(synonym);
+
+            if (!synonym.empty()) {
+                TRACE << "Add synonym: " << synonym << " -> " << mainName;
+                _synonyms.insert(std::make_pair(mainName, synonym));
+            }
+        }
     }
 
     input.close();
