@@ -5,7 +5,7 @@
 #include <comppi/service/log/Log.h>
 #include <comppi/service/species/Species.h>
 #include <comppi/service/database/Inserter.h>
-#include <comppi/service/driver/SystemTypeAdapter.H>
+#include <comppi/service/driver/SystemTypeAdapter.h>
 #include <comppi/service/driver/interaction/MultimapAdapter.H>
 
 #include <comppi/entity/gen/Interaction-odb.hxx>
