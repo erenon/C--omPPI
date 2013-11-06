@@ -139,7 +139,6 @@ bool Organelle::iterator::operator!=(const iterator& rhs) const {
 
 bool Organelle::iterator::setLocalizationId() {
     std::string goc;
-    int locId;
     return _driver.goCode(_it[0], goc) && _driver.locId(goc, _localizationId);
 }
 
