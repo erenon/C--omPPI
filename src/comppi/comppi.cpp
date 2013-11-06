@@ -9,6 +9,7 @@
 
 #include <comppi/controller/Map.h>
 #include <comppi/controller/Interaction.h>
+#include <comppi/controller/Localization.h>
 
 int main(int argc, char* argv[]) {
     using comppi::service::Container;
@@ -92,9 +93,16 @@ int main(int argc, char* argv[]) {
 //        mapController.build(inputs);
 //    }
 
+//    {
+//        using comppi::controller::Interaction;
+//        Interaction controller(container);
+//        std::vector<std::string> inputs;
+//        controller.build(inputs);
+//    }
+
     {
-        using comppi::controller::Interaction;
-        Interaction controller(container);
+        using comppi::controller::Localization;
+        Localization controller(container);
         std::vector<std::string> inputs;
         controller.build(inputs);
     }
