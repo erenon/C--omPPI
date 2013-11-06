@@ -1,5 +1,5 @@
-#ifndef COMPPI_SERVICE_DRIVER_INTERACTION_MULTIMAPADAPTER_H_
-#define COMPPI_SERVICE_DRIVER_INTERACTION_MULTIMAPADAPTER_H_
+#ifndef COMPPI_SERVICE_DRIVER_INTERACTION_PROTEINADAPTER_H_
+#define COMPPI_SERVICE_DRIVER_INTERACTION_PROTEINADAPTER_H_
 
 #include <deque>
 #include <memory>
@@ -17,11 +17,11 @@ namespace driver {
 namespace interaction {
 
 template <typename Driver>
-class MultimapAdapter {
+class ProteinAdapter {
 private:
     typedef typename Driver::iterator DriverIt;
 public:
-    MultimapAdapter(Container& container, Driver driver)
+    ProteinAdapter(Container& container, Driver driver)
         :_sProtein(container.get<protein::Protein>()),
          _driver(driver)
     {}
@@ -66,8 +66,8 @@ public:
             auto translatedAs = _sProtein->translate(*interaction.getActorA());
             auto translatedBs = _sProtein->translate(*interaction.getActorB());
 
-            for (auto translatedA : translatedAs) {
-                for (auto translatedB : translatedBs) {
+            for (auto& translatedA : translatedAs) {
+                for (auto& translatedB : translatedBs) {
                     entity::Interaction tInteraction(interaction);
 
                     auto actorA = std::make_shared<entity::Protein>(translatedA);
@@ -109,4 +109,4 @@ private:
 } // namespace service
 } // namespace comppi
 
-#endif // COMPPI_SERVICE_DRIVER_INTERACTION_MULTIMAPADAPTER_H_
+#endif // COMPPI_SERVICE_DRIVER_INTERACTION_PROTEINADAPTER_H_
