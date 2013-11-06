@@ -13,6 +13,7 @@ namespace comppi {
 namespace entity {
 
 class Interaction;
+class Localization;
 
 #pragma db object
 class SystemType {
@@ -89,6 +90,9 @@ private:
 
     #pragma db value_not_null inverse(_systemTypes)
     std::vector<odb::lazy_weak_ptr<Interaction>> _interactions;
+
+    #pragma db value_not_null inverse(_systemTypes)
+    std::vector<odb::lazy_weak_ptr<Localization>> _localizations;
 };
 
 } // namespace entity
@@ -96,6 +100,7 @@ private:
 
 #ifdef ODB_COMPILER
     #include <comppi/entity/Interaction.h>
+    #include <comppi/entity/Localization.h>
 #endif
 
 #endif  // COMPPI_ENTITY_SYSTEMTYPE_H_
