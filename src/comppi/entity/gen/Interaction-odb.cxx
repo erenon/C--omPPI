@@ -5,6 +5,7 @@
 #include <odb/pre.hxx>
 
 #include <comppi/entity/gen/Interaction-odb.hxx>
+#include <comppi/entity/gen/Localization-odb.hxx>
 #include <comppi/entity/gen/SystemType-odb.hxx>
 
 #include <cassert>
