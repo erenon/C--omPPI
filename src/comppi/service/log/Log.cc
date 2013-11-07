@@ -1,10 +1,12 @@
 #include <comppi/service/log/Log.h>
 #include <comppi/service/config/Config.h>
 
-using comppi::service::config::Config;
+namespace comppi {
+namespace service {
+namespace log {
 
-void bootstrapLog(const Config& config) {
-    std::string levelStr = config.get("level", std::string("info"));
+void bootstrapLog(const comppi::service::config::Config& config) {
+    std::string levelStr = config.get("log.level", std::string("info"));
 
     namespace blt = boost::log::trivial;
 
@@ -19,3 +21,7 @@ void bootstrapLog(const Config& config) {
         boost::log::trivial::severity >= level
     );
 }
+
+} // namespace log
+} // namespace service
+} // namespace comppi
