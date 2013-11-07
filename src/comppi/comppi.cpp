@@ -78,10 +78,17 @@ int main(int argc, char* argv[]) {
             return 0;
         }
 
-//    {   // TODO bootstrap logging
-//        auto config = container.get<Config>();
-//        std::cout << config->get("log.level") << std::endl;
-//    }
+        {   // bootstrap logging
+            auto config = container.get<Config>();
+
+            if (vm.count("moreverbose")) {
+                config->set("log.level", "trace");
+            } else if (vm.count("verbose")) {
+                config->set("log.level", "debug");
+            }
+
+            comppi::service::log::bootstrapLog(*config);
+        }
 
         // TODO show proper help messages
         // e.g: list available commands
