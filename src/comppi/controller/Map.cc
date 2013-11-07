@@ -15,71 +15,19 @@ namespace comppi {
 namespace controller {
 
 Map::Map(service::Container& container)
-    :_container(container)
-{
-    auto configPtr = container.get<service::config::Config>();
+    :Builder(container, "map")
+{}
 
-    _mapPath =
-        configPtr->get("driver.sourcePath") +
-        configPtr->get("driver.mapDir");
+int Map::build(const service::config::Config& config) {
+    int invalidConfig = checkConfig(config);
+    if (invalidConfig) { return invalidConfig; }
 
-    _mapSources.loadFile(_mapPath + "maps.json");
-}
+    auto driverOptions = config.subtree("driverOptions");
+    invalidConfig = enrichDriverOptions(config, driverOptions);
+    if (invalidConfig) { return invalidConfig; }
 
-int Map::build(std::vector<std::string> inputs) {
-    int status = 0;
-
-    if (inputs.empty()) {
-        INFO << "Build all map sources";
-
-        for (auto sourceConfig : _mapSources) {
-            status |= build(sourceConfig);
-        }
-    } else {
-        for (auto source : inputs) {
-            try {
-                auto sourceConfig = _mapSources.subtree(source);
-                status |= build(sourceConfig);
-
-            } catch (const std::invalid_argument&) {
-                ERROR << "Source not found: '" << source << "'";
-                status = 1;
-            }
-        }
-    }
-
-    return status;
-}
-
-int Map::build(const service::config::Config& mapConfig) {
-    std::string driverName;
-    std::string filePath = _mapPath; // + config value
-    auto driverConfig = mapConfig.subtree("driverOptions");
-
-    try {
-        driverName = mapConfig.get("driver");
-    } catch (const std::invalid_argument&) {
-        ERROR << "Invalid source configuration, missing mandatory 'driver' key.";
-    }
-
-    try {
-        auto speciesPtr = _container.get<service::species::Species>();
-
-        driverConfig.set(
-            "speciesId",
-            speciesPtr->getByAbbr(mapConfig.get("speciesAbbr")).id
-        );
-    } catch (const std::invalid_argument&) {
-        ERROR << "Invalid source configuration, missing mandatory 'speciesAbbr' key.";
-    } catch (const std::out_of_range&) {
-        ERROR << "Invalid source configuration, invalid 'speciesAbbr' key.";
-    }
-
-    try {
-        filePath += mapConfig.get("file");
-    } catch (const std::invalid_argument&) {
-        ERROR << "Invalid source configuration, missing mandatory 'file' key.";
-    }
+    std::string driverName = config.get("driver");
+    std::string filePath = _sourcePath + config.get("file");
 
     std::fstream input(filePath, std::fstream::in);
 
@@ -94,7 +42,7 @@ int Map::build(const service::config::Config& mapConfig) {
         using service::driver::map::Biogrid;
 
         try {
-            Biogrid driver(input, driverConfig);
+            Biogrid driver(input, driverOptions);
 
             auto inserterPtr = _container.get<service::database::Inserter<Biogrid>>();
             inserterPtr->insert(driver);

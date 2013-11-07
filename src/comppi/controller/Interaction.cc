@@ -16,71 +16,19 @@ namespace comppi {
 namespace controller {
 
 Interaction::Interaction(service::Container& container)
-    :_container(container)
-{
-    auto configPtr = container.get<service::config::Config>();
+    :Builder(container, "interaction")
+{}
 
-    _interactionPath =
-        configPtr->get("driver.sourcePath") +
-        configPtr->get("driver.interactionDir");
+int Interaction::build(const Config& config) {
+    int invalidConfig = checkConfig(config);
+    if (invalidConfig) { return invalidConfig; }
 
-    _interactionSources.loadFile(_interactionPath + "interactions.json");
-}
+    auto driverOptions = config.subtree("driverOptions");
+    invalidConfig = enrichDriverOptions(config, driverOptions);
+    if (invalidConfig) { return invalidConfig; }
 
-int Interaction::build(std::vector<std::string> inputs) {
-    int status = 0;
-
-    if (inputs.empty()) {
-        INFO << "Build all interaction sources";
-
-        for (auto sourceConfig : _interactionSources) {
-            status |= build(sourceConfig);
-        }
-    } else {
-        for (auto source : inputs) {
-            try {
-                auto sourceConfig = _interactionSources.subtree(source);
-                status |= build(sourceConfig);
-
-            } catch (const std::invalid_argument&) {
-                ERROR << "Source not found: '" << source << "'";
-                status = 1;
-            }
-        }
-    }
-
-    return status;
-}
-
-int Interaction::build(const Config& interactionConfig) {
-    std::string driverName;
-    std::string filePath = _interactionPath; // + config value
-    auto driverConfig = interactionConfig.subtree("driverOptions");
-
-    try {
-        driverName = interactionConfig.get("driver");
-    } catch (const std::invalid_argument&) {
-        ERROR << "Invalid source configuration, missing mandatory 'driver' key.";
-    }
-
-    try {
-        auto speciesPtr = _container.get<service::species::Species>();
-
-        driverConfig.set(
-            "speciesId",
-            speciesPtr->getByAbbr(interactionConfig.get("speciesAbbr")).id
-        );
-    } catch (const std::invalid_argument&) {
-        ERROR << "Invalid source configuration, missing mandatory 'speciesAbbr' key.";
-    } catch (const std::out_of_range&) {
-        ERROR << "Invalid source configuration, invalid 'speciesAbbr' key.";
-    }
-
-    try {
-        filePath += interactionConfig.get("file");
-    } catch (const std::invalid_argument&) {
-        ERROR << "Invalid source configuration, missing mandatory 'file' key.";
-    }
+    std::string driverName = config.get("driver");
+    std::string filePath = _sourcePath + config.get("file");
 
     std::fstream input(filePath, std::fstream::in);
 
@@ -98,7 +46,7 @@ int Interaction::build(const Config& interactionConfig) {
         using service::driver::interaction::Biogrid;
 
         try {
-            Biogrid driver(input, driverConfig);
+            Biogrid driver(input, driverOptions);
             SystemTypeAdapter<Biogrid> stadapter(_container, driver);
             ProteinAdapter<SystemTypeAdapter<Biogrid>> multimap(_container, stadapter);
 

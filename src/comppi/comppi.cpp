@@ -86,6 +86,8 @@ int main(int argc, char* argv[]) {
         // TODO show proper help messages
         // e.g: list available commands
 
+        // TODO return command method result
+
         if (vm.count("command")) {
             std::cout << vm["command"].as<std::string>() << std::endl;
 
@@ -109,19 +111,19 @@ int main(int argc, char* argv[]) {
                     {
                         using comppi::controller::Map;
                         Map mapController(container);
-                        mapController.build(inputs);
+                        mapController.buildAll(inputs);
                     }
                     else if (subcommand == "interaction")
                     {
                         using comppi::controller::Interaction;
                         Interaction controller(container);
-                        controller.build(inputs);
+                        controller.buildAll(inputs);
                     }
                     else if (subcommand == "localization")
                     {
                         using comppi::controller::Localization;
                         Localization controller(container);
-                        controller.build(inputs);
+                        controller.buildAll(inputs);
                     }
                     else
                     {

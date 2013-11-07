@@ -7,24 +7,19 @@
 #include <comppi/service/Container.h>
 #include <comppi/service/config/Config.h>
 
-//#include <comppi/controller/BuildAbstract.h>
+#include <comppi/controller/Builder.h>
 
 namespace comppi {
 namespace controller {
 
 using service::config::Config;
 
-class Map /*:public BuildAbstract*/ {
+class Map : public Builder {
 public:
     Map(service::Container& container);
-    int build(std::vector<std::string> inputs);
 
 private:
-    int build(const Config& mapConfig);
-
-    service::Container& _container;
-    std::string _mapPath;
-    Config _mapSources;
+    int build(const Config& config);
 };
 
 } // namespace controller

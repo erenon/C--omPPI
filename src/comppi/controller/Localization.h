@@ -7,22 +7,19 @@
 #include <comppi/service/Container.h>
 #include <comppi/service/config/Config.h>
 
+#include <comppi/controller/Builder.h>
+
 namespace comppi {
 namespace controller {
 
 using service::config::Config;
 
-class Localization {
+class Localization : public Builder {
 public:
     Localization(service::Container& container);
-    int build(std::vector<std::string> inputs);
 
 private:
-    int build(const Config& interactionConfig);
-
-    service::Container& _container;
-    std::string _localizationPath;
-    Config _localizationSources;
+    int build(const Config& config);
 };
 
 } // namespace controller
