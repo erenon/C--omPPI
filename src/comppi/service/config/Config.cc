@@ -26,7 +26,7 @@ Config Config::subtree(const char* key) const {
             << "Config: subtree not found for key: "
             << key;
 
-        return Config();
+        throw std::invalid_argument(ex.what());
     }
 }
 
