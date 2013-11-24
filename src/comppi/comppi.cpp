@@ -12,6 +12,7 @@
 #include <comppi/controller/Map.h>
 #include <comppi/controller/Interaction.h>
 #include <comppi/controller/Localization.h>
+#include <comppi/controller/Gexf.h>
 
 bool parseArgs(
     int argc, char* argv[],
@@ -114,6 +115,25 @@ int dispatchCommand(
             }
         } else {
             std::cout << "Usage: build subcommand" << std::endl;
+            return 0;
+        }
+    } else if (command == "generate") {
+        if (vm.count("subcommand")) {
+            std::string subcommand = vm["subcommand"].as<std::string>();
+
+            if (subcommand == "gexfgraph")
+            {
+                using comppi::controller::Gexf;
+                Gexf controller(container);
+                return controller.generate();
+            }
+            else
+            {
+                std::cerr << "Unknown subcommand" << std::endl;
+                return 1;
+            }
+        } else {
+            std::cout << "Usage: generate subcommand" << std::endl;
             return 0;
         }
     } else {

@@ -44,5 +44,9 @@
         "mapDir": "map/",
         "localizationDir": "localization/",
         "interactionDir": "interaction/"
+    },
+    
+    "gexf": {
+    	"output": "${comppi_root}/interactions.gexf"
     }
 }
