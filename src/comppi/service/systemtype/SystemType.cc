@@ -94,6 +94,11 @@ entity::SystemType SystemType::getSystemType(const std::string& name) {
     typedef odb::prepared_query<entity::SystemType> PrepQuery;
     typedef odb::result<entity::SystemType> Result;
 
+    entity::SystemType systemType(name, entity::SystemType::UNKNOWN);
+    if (_cache.get(name, systemType)) {
+        return systemType;
+    }
+
     using comppi::service::database::Transaction;
     Transaction transaction(_databasePtr->begin());
 
@@ -131,14 +136,18 @@ entity::SystemType SystemType::getSystemType(const std::string& name) {
     Result rSystemType(pqSystemType.execute());
 
     if (!rSystemType.empty()) {
-        auto systemType = *rSystemType.begin();
+        systemType = *rSystemType.begin();
         transaction.commit();
+
+        _cache.add(name, systemType);
 
         return systemType;
     } else {
-        entity::SystemType systemType(name, entity::SystemType::UNKNOWN);
         _databasePtr->persist(systemType);
         transaction.commit();
+
+        _cache.add(name, systemType);
+
         return systemType;
     }
 }

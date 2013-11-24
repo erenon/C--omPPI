@@ -8,6 +8,7 @@
 
 #include <comppi/service/Container.h>
 #include <comppi/service/database/Database.h>
+#include <comppi/utility/Cache.h>
 
 namespace comppi {
 
@@ -43,6 +44,7 @@ private:
     const std::string _synonymPath;
     database::DatabasePtr _databasePtr;
     std::map<std::string, std::string> _synonyms;
+    utility::Cache<std::string, entity::SystemType, 3> _cache;
 };
 
 } // namespace systemtype

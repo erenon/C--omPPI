@@ -58,6 +58,14 @@ public:
         _proteinNamingConvention = proteinNamingConvention;
     }
 
+    bool operator==(const Protein& rhs) const {
+        return (
+            _specieId == rhs._specieId
+        &&  _proteinName == rhs._proteinName
+        &&  _proteinNamingConvention == rhs._proteinNamingConvention
+        );
+    }
+
 private:
     friend class odb::access;
 

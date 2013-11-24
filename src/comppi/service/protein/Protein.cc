@@ -44,7 +44,10 @@ Protein::Protein(
 
 std::vector<entity::Protein>
 Protein::translate(const entity::Protein& protein) {
-    // TODO add cache
+    std::vector<entity::Protein> persistedProteins;
+    if (_translationCache.get(protein, persistedProteins)) {
+        return persistedProteins;
+    }
 
     database::Transaction transaction(_databasePtr->begin());
 
@@ -55,7 +58,6 @@ Protein::translate(const entity::Protein& protein) {
     proteins.reserve(translations.size());
 
     for (auto translation : translations) {
-        // TODO use emplace if gcc version >= 4.8
         proteins.push_back(entity::Protein(
             protein.getSpecieId(),
             translation.getProteinNameB(),
@@ -63,7 +65,6 @@ Protein::translate(const entity::Protein& protein) {
         ));
     }
 
-    std::vector<entity::Protein> persistedProteins;
     persistedProteins.reserve(proteins.size());
 
     for (auto protein : proteins) {
@@ -71,6 +72,8 @@ Protein::translate(const entity::Protein& protein) {
     }
 
     transaction.commit();
+
+    _translationCache.add(protein, persistedProteins);
 
     return persistedProteins;
 }

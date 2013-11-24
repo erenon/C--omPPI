@@ -6,6 +6,8 @@
 
 #include <comppi/service/database/Database.h>
 
+#include <comppi/utility/Cache.h>
+
 namespace comppi {
 namespace entity {
 
@@ -41,6 +43,7 @@ private:
 
     database::DatabasePtr _databasePtr;
     std::vector<std::string> _namingConventionOrder;
+    utility::Cache<entity::Protein, std::vector<entity::Protein>, 5> _translationCache;
 };
 
 } // namespace protein
