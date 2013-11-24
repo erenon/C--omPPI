@@ -14,8 +14,12 @@ namespace entity {
 
 class SystemType;
 
+#pragma db value(std::string) type("VARCHAR(255)")
+
 #pragma db object table("ProteinToLocalization")
 class Localization {
+    #pragma db index("search_idx") members(_protein)
+    #pragma db index("single_loc_per_source") members(_protein, _localizationId, _sourceDb)
 public:
     Localization(
         const std::shared_ptr<Protein>& protein,

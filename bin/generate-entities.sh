@@ -32,9 +32,12 @@ for input in $@; do
         
         $changed = true
         
-        odb -d mysql --std c++11 --generate-query \
+        odb -d mysql --std c++11 \
+        --generate-query \
+        --generate-prepared \
         --guard-prefix COMPPI_ENTITY_GEN_ \
-        --include-with-brackets --include-prefix comppi/entity/ \
+        --include-with-brackets \
+        --include-prefix comppi/entity/ \
         --include-regex "%comppi/entity/(.+)-odb(.+)%comppi/entity/gen/\1-odb\2%" \
         --output-dir $(dirname $input)/gen/ \
         -x -I"$(dirname $input)/../../" \

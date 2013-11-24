@@ -14,8 +14,13 @@ namespace entity {
 
 class SystemType;
 
+#pragma db value(std::string) type("VARCHAR(255)")
+
 #pragma db object
 class Interaction {
+    #pragma db index("search_idx_aid") members(_actorA)
+    #pragma db index("search_idx_bid") members(_actorB)
+    #pragma db index("single_interaction_per_source") members(_actorA, _actorB, _sourceDb)
 public:
     Interaction(
         const std::shared_ptr<Protein>& actorA,

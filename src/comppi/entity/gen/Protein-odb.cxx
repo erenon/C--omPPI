@@ -19,6 +19,7 @@
 #include <odb/mysql/simple-object-statements.hxx>
 #include <odb/mysql/container-statements.hxx>
 #include <odb/mysql/exceptions.hxx>
+#include <odb/mysql/prepared-query.hxx>
 #include <odb/mysql/simple-object-result.hxx>
 #include <odb/mysql/enum.hxx>
 
@@ -714,6 +715,90 @@ namespace odb
       q.parameters_binding ());
 
     return st.execute ();
+  }
+
+  odb::details::shared_ptr<prepared_query_impl>
+  access::object_traits_impl< ::comppi::entity::Protein, id_mysql >::
+  prepare_query (connection& c, const char* n, const query_base_type& q)
+  {
+    using namespace mysql;
+    using odb::details::shared;
+    using odb::details::shared_ptr;
+
+    mysql::connection& conn (
+      static_cast<mysql::connection&> (c));
+
+    statements_type& sts (
+      conn.statement_cache ().find_object<object_type> ());
+
+    image_type& im (sts.image ());
+    binding& imb (sts.select_image_binding ());
+
+    if (im.version != sts.select_image_version () ||
+        imb.version == 0)
+    {
+      bind (imb.bind, im, statement_select);
+      sts.select_image_version (im.version);
+      imb.version++;
+    }
+
+    shared_ptr<mysql::prepared_query_impl> r (
+      new (shared) mysql::prepared_query_impl (conn));
+    r->name = n;
+    r->execute = &execute_query;
+    r->query = q;
+    r->stmt.reset (
+      new (shared) select_statement (
+        conn,
+        query_statement + r->query.clause (),
+        r->query.parameters_binding (),
+        imb));
+
+    return r;
+  }
+
+  odb::details::shared_ptr<result_impl>
+  access::object_traits_impl< ::comppi::entity::Protein, id_mysql >::
+  execute_query (prepared_query_impl& q)
+  {
+    using namespace mysql;
+    using odb::details::shared;
+    using odb::details::shared_ptr;
+
+    mysql::prepared_query_impl& pq (
+      static_cast<mysql::prepared_query_impl&> (q));
+    shared_ptr<select_statement> st (
+      odb::details::inc_ref (
+        static_cast<select_statement*> (pq.stmt.get ())));
+
+    mysql::connection& conn (
+      mysql::transaction::current ().connection ());
+
+    // The connection used by the current transaction and the
+    // one used to prepare this statement must be the same.
+    //
+    assert (&conn == &st->connection ());
+
+    statements_type& sts (
+      conn.statement_cache ().find_object<object_type> ());
+
+    image_type& im (sts.image ());
+    binding& imb (sts.select_image_binding ());
+
+    if (im.version != sts.select_image_version () ||
+        imb.version == 0)
+    {
+      bind (imb.bind, im, statement_select);
+      sts.select_image_version (im.version);
+      imb.version++;
+    }
+
+    pq.query.init_parameters ();
+    st->execute ();
+
+    return shared_ptr<result_impl> (
+      new (shared) mysql::object_result_impl<object_type> (
+        pq.query, st, sts));
   }
 }
 

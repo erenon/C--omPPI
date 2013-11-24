@@ -15,8 +15,11 @@ namespace entity {
 class Interaction;
 class Localization;
 
+#pragma db value(std::string) type("VARCHAR(255)")
+
 #pragma db object
 class SystemType {
+    #pragma db index("search_idx") members(_name)
 public:
     enum ConfidenceType {
         UNKNOWN = 0,

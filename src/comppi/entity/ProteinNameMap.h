@@ -8,8 +8,18 @@
 namespace comppi {
 namespace entity {
 
+#pragma db value(std::string) type("VARCHAR(255)")
+
 #pragma db object
 class ProteinNameMap {
+#pragma db index("search_idx") members(_proteinNameA, _namingConventionA, _specieId)
+#pragma db index("reverse_search_idx") members(_proteinNameB, _namingConventionB, _specieId)
+#pragma db index("unique_translation")              \
+    members(                                        \
+        _proteinNameA, _proteinNameB,               \
+        _namingConventionA, _namingConventionB,     \
+        _specieId                                   \
+    )
 public:
     ProteinNameMap() {}
 

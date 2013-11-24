@@ -25,6 +25,7 @@
 #include <odb/pointer-traits.hxx>
 #include <odb/container-traits.hxx>
 #include <odb/no-op-cache-traits.hxx>
+#include <odb/prepared-query.hxx>
 #include <odb/result.hxx>
 
 #include <odb/details/unused.hxx>

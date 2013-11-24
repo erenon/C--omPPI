@@ -8,8 +8,12 @@
 namespace comppi {
 namespace entity {
 
+#pragma db value(std::string) type("VARCHAR(255)")
+
 #pragma db object
 class Protein {
+    #pragma db index("search_idx") members(_proteinName, _proteinNamingConvention)
+    #pragma db index("species_idx") members(_specieId)
 public:
     Protein(
         int specieId,

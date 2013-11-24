@@ -18,6 +18,7 @@
 #include <odb/mysql/statement-cache.hxx>
 #include <odb/mysql/container-statements.hxx>
 #include <odb/mysql/exceptions.hxx>
+#include <odb/mysql/prepared-query.hxx>
 #include <odb/mysql/enum.hxx>
 
 namespace odb

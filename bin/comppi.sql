@@ -19,15 +19,23 @@ DROP TABLE IF EXISTS `Protein`;
 CREATE TABLE `Protein` (
   `id` INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
   `specieId` INT NOT NULL,
-  `proteinName` TEXT NOT NULL,
-  `proteinNamingConvention` TEXT NOT NULL)
+  `proteinName` VARCHAR(255) NOT NULL,
+  `proteinNamingConvention` VARCHAR(255) NOT NULL)
  ENGINE=InnoDB;
+
+CREATE INDEX `search_idx`
+  ON `Protein` (
+    `proteinName`,
+    `proteinNamingConvention`);
+
+CREATE INDEX `species_idx`
+  ON `Protein` (`specieId`);
 
 CREATE TABLE `Interaction` (
   `id` INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
   `actorAId` INT UNSIGNED,
   `actorBId` INT UNSIGNED,
-  `sourceDb` TEXT NOT NULL,
+  `sourceDb` VARCHAR(255) NOT NULL,
   `pubmedId` INT NOT NULL
 
   /*
@@ -42,6 +50,18 @@ CREATE TABLE `Interaction` (
     REFERENCES `Protein` (`id`)
   */)
  ENGINE=InnoDB;
+
+CREATE INDEX `search_idx_aid`
+  ON `Interaction` (`actorAId`);
+
+CREATE INDEX `search_idx_bid`
+  ON `Interaction` (`actorBId`);
+
+CREATE INDEX `single_interaction_per_source`
+  ON `Interaction` (
+    `actorAId`,
+    `actorBId`,
+    `sourceDb`);
 
 CREATE TABLE `InteractionToSystemType` (
   `interactionId` INT UNSIGNED NOT NULL,
@@ -58,15 +78,18 @@ CREATE INDEX `interactionId_i`
 
 CREATE TABLE `SystemType` (
   `id` INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
-  `name` TEXT NOT NULL,
+  `name` VARCHAR(255) NOT NULL,
   `confidenceType` INT NOT NULL)
  ENGINE=InnoDB;
+
+CREATE INDEX `search_idx`
+  ON `SystemType` (`name`);
 
 CREATE TABLE `ProteinToLocalization` (
   `id` INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
   `proteinId` INT UNSIGNED,
   `localizationId` INT NOT NULL,
-  `sourceDb` TEXT NOT NULL,
+  `sourceDb` VARCHAR(255) NOT NULL,
   `pubmedId` INT NOT NULL
 
   /*
@@ -75,6 +98,15 @@ CREATE TABLE `ProteinToLocalization` (
     REFERENCES `Protein` (`id`)
   */)
  ENGINE=InnoDB;
+
+CREATE INDEX `search_idx`
+  ON `ProteinToLocalization` (`proteinId`);
+
+CREATE INDEX `single_loc_per_source`
+  ON `ProteinToLocalization` (
+    `proteinId`,
+    `localizationId`,
+    `sourceDb`);
 
 CREATE TABLE `ProtLocToSystemType` (
   `protLocId` INT UNSIGNED NOT NULL,
@@ -98,11 +130,31 @@ CREATE INDEX `protLocId_i`
 CREATE TABLE `ProteinNameMap` (
   `id` INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
   `specieId` INT NOT NULL,
-  `namingConventionA` TEXT NOT NULL,
-  `proteinNameA` TEXT NOT NULL,
-  `namingConventionB` TEXT NOT NULL,
-  `proteinNameB` TEXT NOT NULL)
+  `namingConventionA` VARCHAR(255) NOT NULL,
+  `proteinNameA` VARCHAR(255) NOT NULL,
+  `namingConventionB` VARCHAR(255) NOT NULL,
+  `proteinNameB` VARCHAR(255) NOT NULL)
  ENGINE=InnoDB;
+
+CREATE INDEX `search_idx`
+  ON `ProteinNameMap` (
+    `proteinNameA`,
+    `namingConventionA`,
+    `specieId`);
+
+CREATE INDEX `reverse_search_idx`
+  ON `ProteinNameMap` (
+    `proteinNameB`,
+    `namingConventionB`,
+    `specieId`);
+
+CREATE INDEX `unique_translation`
+  ON `ProteinNameMap` (
+    `proteinNameA`,
+    `proteinNameB`,
+    `namingConventionA`,
+    `namingConventionB`,
+    `specieId`);
 
 /*
 ALTER TABLE `InteractionToSystemType` ADD
