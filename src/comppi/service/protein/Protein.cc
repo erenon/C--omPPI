@@ -81,18 +81,48 @@ Protein::translate(const entity::Protein& protein) {
 std::vector<entity::ProteinNameMap>
 Protein::getStrongestTranslations(const entity::Protein& protein) {
     typedef odb::query<entity::ProteinNameMap> Query;
+    typedef odb::prepared_query<entity::ProteinNameMap> PrepQuery;
     typedef odb::result<entity::ProteinNameMap> Result;
 
-    // TODO use prepared query
-    // http://www.codesynthesis.com/products/odb/doc/manual.xhtml#4.5
+    entity::Protein* pProtein;
 
-    Query qStrongerTranslations(
-        Query::specieId == protein.getSpecieId()
-    &&  Query::proteinNameA == protein.getProteinName()
-    &&  Query::namingConventionA == protein.getProteinNamingConvention());
+    PrepQuery pqStrongerTranslations(
+        _databasePtr->lookup_query<entity::ProteinNameMap>(
+            "protein-stronger-translation",
+            pProtein
+        )
+    );
+
+    if (!pqStrongerTranslations) {
+        DEBUG << "Prepare query: protein-stronger-translation";
+
+        std::unique_ptr<entity::Protein> proteinPtr(
+            new entity::Protein(protein)
+        );
+
+        pProtein = proteinPtr.get();
+
+        Query qStrongerTranslations(
+            Query::proteinNameA == Query::_ref(proteinPtr->getProteinName())
+        &&  Query::namingConventionA == Query::_ref(proteinPtr->getProteinNamingConvention())
+        &&  Query::specieId == Query::_ref(proteinPtr->getSpecieId())
+        );
+
+        pqStrongerTranslations = _databasePtr->prepare_query<entity::ProteinNameMap>(
+            "protein-stronger-translation",
+            qStrongerTranslations
+        );
+
+        _databasePtr->cache_query(
+            pqStrongerTranslations,
+            std::move(proteinPtr)
+        );
+    }
+
+    *pProtein = protein;
 
     Result rStrongerTranslations(
-        _databasePtr->query<entity::ProteinNameMap>(qStrongerTranslations)
+        pqStrongerTranslations.execute()
     );
 
     auto strongestOrder = translationOrder(protein.getProteinNamingConvention());
@@ -183,16 +213,57 @@ std::size_t Protein::translationOrder(
  */
 entity::Protein Protein::persistProtein(entity::Protein& protein) {
     typedef odb::query<entity::Protein> Query;
+    typedef odb::prepared_query<entity::Protein> PrepQuery;
     typedef odb::result<entity::Protein> Result;
 
-    // TODO use prepared query
     Query qProtein(
-        Query::specieId == protein.getSpecieId()
-    &&  Query::proteinName == protein.getProteinName()
+        Query::proteinName == protein.getProteinName()
     &&  Query::proteinNamingConvention == protein.getProteinNamingConvention()
+    &&  Query::specieId == protein.getSpecieId()
     );
 
     Result rProtein(_databasePtr->query<entity::Protein>(qProtein));
+
+    // TODO enabling this slows the build to a crawl
+    // reason unknown
+//    entity::Protein* pProtein;
+//
+//    PrepQuery pqProtein(
+//        _databasePtr->lookup_query<entity::Protein>(
+//            "protein-protein",
+//            pProtein
+//        )
+//    );
+//
+//    if (!pqProtein) {
+//        DEBUG << "Prepare query: protein-protein";
+//
+//        std::unique_ptr<entity::Protein> proteinPtr(
+//            new entity::Protein(protein)
+//        );
+//
+//        pProtein = proteinPtr.get();
+//
+//        Query qProtein(
+//            Query::proteinName == Query::_ref(proteinPtr->getProteinName())
+//        &&  Query::proteinNamingConvention == Query::_ref(proteinPtr->getProteinNamingConvention())
+//        &&  Query::specieId == Query::_ref(proteinPtr->getSpecieId())
+//        );
+//
+//        pqProtein = _databasePtr->prepare_query<entity::Protein>(
+//            "protein-protein",
+//            qProtein
+//        );
+//
+//        _databasePtr->cache_query(
+//            pqProtein,
+//            std::move(proteinPtr)
+//        );
+//    }
+//
+//    *pProtein = protein;
+//
+//    Result rProtein(pqProtein.execute());
 
     if (!rProtein.empty()) {
         return *rProtein.begin();

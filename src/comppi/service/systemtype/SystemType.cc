@@ -91,15 +91,44 @@ bool SystemType::loadDatabase() {
 
 entity::SystemType SystemType::getSystemType(const std::string& name) {
     typedef odb::query<entity::SystemType> Query;
+    typedef odb::prepared_query<entity::SystemType> PrepQuery;
     typedef odb::result<entity::SystemType> Result;
+
     using comppi::service::database::Transaction;
-
-    // TODO use prepared query
-    Query qSystemType(Query::name == name);
-
     Transaction transaction(_databasePtr->begin());
 
-    Result rSystemType(_databasePtr->query<entity::SystemType>(qSystemType));
+    std::string* pName;
+
+    PrepQuery pqSystemType(
+        _databasePtr->lookup_query<entity::SystemType>(
+            "systemtype-systemtype",
+            pName
+        )
+    );
+
+    if (!pqSystemType) {
+        DEBUG << "Prepare query: systemtype-systemtype";
+
+        std::unique_ptr<std::string> namePtr(new std::string);
+
+        pName = namePtr.get();
+
+        Query qSystemType(Query::name == Query::_ref(*namePtr));
+
+        pqSystemType = _databasePtr->prepare_query<entity::SystemType>(
+            "systemtype-systemtype",
+            qSystemType
+        );
+
+        _databasePtr->cache_query(
+            pqSystemType,
+            std::move(namePtr)
+        );
+    }
+
+    *pName = name;
+
+    Result rSystemType(pqSystemType.execute());
 
     if (!rSystemType.empty()) {
         auto systemType = *rSystemType.begin();
