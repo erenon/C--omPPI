@@ -26,7 +26,8 @@ CREATE TABLE `Protein` (
 CREATE INDEX `search_idx`
   ON `Protein` (
     `proteinName`,
-    `proteinNamingConvention`);
+    `proteinNamingConvention`,
+    `specieId`);
 
 CREATE INDEX `species_idx`
   ON `Protein` (`specieId`);

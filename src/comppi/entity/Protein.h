@@ -12,7 +12,7 @@ namespace entity {
 
 #pragma db object
 class Protein {
-    #pragma db index("search_idx") members(_proteinName, _proteinNamingConvention)
+    #pragma db index("search_idx") members(_proteinName, _proteinNamingConvention, _specieId)
     #pragma db index("species_idx") members(_specieId)
 public:
     Protein(
