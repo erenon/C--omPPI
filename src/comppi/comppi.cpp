@@ -16,6 +16,7 @@
 #include <comppi/controller/Namelookup.h>
 #include <comppi/controller/Namelist.h>
 #include <comppi/controller/CheckLoc.h>
+#include <comppi/controller/CheckSource.h>
 
 bool parseArgs(
     int argc, char* argv[],
@@ -70,7 +71,8 @@ bool parseArgs(
 
 int dispatchCommand(
     comppi::service::Container& container,
-    boost::program_options::variables_map& vm
+    boost::program_options::variables_map& vm,
+    int argc, char* argv[]
 ) {
     std::string command = vm["command"].as<std::string>();
 
@@ -158,6 +160,10 @@ int dispatchCommand(
                 using comppi::controller::CheckLoc;
                 CheckLoc controller(container);
                 return controller.check();
+            } else if (subcommand == "source") {
+                using comppi::controller::CheckSource;
+                CheckSource controller(container);
+                return controller.check(argv[0]);
             } else {
                 std::cerr << "Unknown subcommand" << std::endl;
                 return 1;
@@ -213,7 +219,7 @@ int main(int argc, char* argv[]) {
     // e.g: list available commands
 
     if (vm.count("command")) {
-        return dispatchCommand(container, vm);
+        return dispatchCommand(container, vm, argc, argv);
     } else {
         std::cout << "Usage: " << argv[0] << " command" << std::endl;
         return 0;
