@@ -4,6 +4,8 @@
 
 DROP TABLE IF EXISTS `ProteinNameMap`;
 
+DROP TABLE IF EXISTS `NameToProtein`;
+
 DROP TABLE IF EXISTS `ProtLocToSystemType`;
 
 DROP TABLE IF EXISTS `ProteinToLocalization`;
@@ -127,6 +129,29 @@ CREATE TABLE `ProtLocToSystemType` (
 
 CREATE INDEX `protLocId_i`
   ON `ProtLocToSystemType` (`protLocId`);
+
+CREATE TABLE `NameToProtein` (
+  `id` INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  `specieId` INT NOT NULL,
+  `name` VARCHAR(255) NOT NULL,
+  `namingConvention` VARCHAR(255) NOT NULL,
+  `proteinId` INT UNSIGNED
+
+  /*
+  CONSTRAINT `NameToProtein_proteinId_fk`
+    FOREIGN KEY (`proteinId`)
+    REFERENCES `Protein` (`id`)
+  */)
+ ENGINE=InnoDB;
+
+CREATE INDEX `search_idx`
+  ON `NameToProtein` (
+    `name`,
+    `namingConvention`,
+    `specieId`);
+
+CREATE INDEX `synonym_idx`
+  ON `NameToProtein` (`proteinId`);
 
 CREATE TABLE `ProteinNameMap` (
   `id` INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
