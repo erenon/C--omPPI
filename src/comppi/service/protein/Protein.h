@@ -35,11 +35,16 @@ public:
     );
 
     std::vector<entity::Protein> translate(const entity::Protein& protein);
+    std::vector<entity::Protein> synonyms(const entity::Protein& protein);
 
 private:
     std::vector<entity::ProteinNameMap> getStrongestTranslations(const entity::Protein& protein);
     std::size_t translationOrder(const std::string& namingConvention) const;
     entity::Protein persistProtein(entity::Protein& protein);
+
+    std::vector<entity::Protein> getSynonyms(std::vector<entity::Protein>& proteins);
+    std::vector<entity::Protein> getWeakerSynonyms(const entity::Protein& protein);
+    std::vector<entity::Protein> getStrongerSynonyms(const entity::Protein& protein);
 
     database::DatabasePtr _databasePtr;
     std::vector<std::string> _namingConventionOrder;
