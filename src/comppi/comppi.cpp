@@ -15,6 +15,7 @@
 #include <comppi/controller/Gexf.h>
 #include <comppi/controller/Namelookup.h>
 #include <comppi/controller/Namelist.h>
+#include <comppi/controller/CheckLoc.h>
 
 bool parseArgs(
     int argc, char* argv[],
@@ -147,6 +148,22 @@ int dispatchCommand(
             }
         } else {
             std::cout << "Usage: generate subcommand" << std::endl;
+            return 0;
+        }
+    } else if (command == "check") {
+        if (vm.count("subcommand")) {
+            std::string subcommand = vm["subcommand"].as<std::string>();
+
+            if (subcommand == "localization") {
+                using comppi::controller::CheckLoc;
+                CheckLoc controller(container);
+                return controller.check();
+            } else {
+                std::cerr << "Unknown subcommand" << std::endl;
+                return 1;
+            }
+        } else {
+            std::cout << "Usage: check subcommand" << std::endl;
             return 0;
         }
     } else {

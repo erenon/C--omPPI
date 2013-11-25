@@ -1,5 +1,6 @@
 #include <fstream>
 #include <stack>
+#include <stdexcept>
 
 #include <comppi/service/localization/Localization.h>
 #include <comppi/service/Container.h>
@@ -41,7 +42,9 @@ void Localization::loadLoctree(const std::string& loctreePath) {
     std::fstream input(loctreePath.c_str(), std::fstream::in);
 
     if (!input) {
-        ERROR << "Failed to open Loctree file";
+        ERROR << "Failed to open Loctree file: '"
+              << loctreePath << "'";
+        throw std::runtime_error("Failed to open Loctree file");
     }
 
     std::size_t previousLevel = 0;
@@ -63,6 +66,7 @@ void Localization::loadLoctree(const std::string& loctreePath) {
             if (previousLevel + 1 != level) {
                 ERROR << "Malformed loctree identation near line: '"
                     << line << "'";
+                throw std::runtime_error("Malformed Loctree file");
             }
 
             ++previousLevel;
