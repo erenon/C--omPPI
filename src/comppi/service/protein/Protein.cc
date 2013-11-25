@@ -280,7 +280,6 @@ entity::Protein Protein::persistProtein(entity::Protein& protein) {
 std::vector<entity::Protein> Protein::synonyms(const entity::Protein& protein) {
     std::vector<entity::Protein> synonyms(1, protein);
     getSynonyms(synonyms);
-    synonyms.erase(synonyms.begin());
 
     return synonyms;
 }
