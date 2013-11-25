@@ -10,3 +10,5 @@ $bin build systemtype
 $bin build map
 $bin build interaction
 $bin build localization
+
+$bin generate namelookup

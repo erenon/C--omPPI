@@ -13,6 +13,7 @@
 #include <comppi/controller/Interaction.h>
 #include <comppi/controller/Localization.h>
 #include <comppi/controller/Gexf.h>
+#include <comppi/controller/Namelookup.h>
 
 bool parseArgs(
     int argc, char* argv[],
@@ -125,6 +126,12 @@ int dispatchCommand(
             {
                 using comppi::controller::Gexf;
                 Gexf controller(container);
+                return controller.generate();
+            }
+            else if (subcommand == "namelookup")
+            {
+                using comppi::controller::Namelookup;
+                Namelookup controller(container);
                 return controller.generate();
             }
             else
