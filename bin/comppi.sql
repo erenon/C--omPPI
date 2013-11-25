@@ -4,6 +4,8 @@
 
 DROP TABLE IF EXISTS `ProteinNameMap`;
 
+DROP TABLE IF EXISTS `ProteinName`;
+
 DROP TABLE IF EXISTS `NameToProtein`;
 
 DROP TABLE IF EXISTS `ProtLocToSystemType`;
@@ -152,6 +154,13 @@ CREATE INDEX `search_idx`
 
 CREATE INDEX `synonym_idx`
   ON `NameToProtein` (`proteinId`);
+
+CREATE TABLE `ProteinName` (
+  `name` VARCHAR(255) NOT NULL PRIMARY KEY)
+ ENGINE=InnoDB;
+
+CREATE UNIQUE INDEX `unique_name`
+  ON `ProteinName` (`name`);
 
 CREATE TABLE `ProteinNameMap` (
   `id` INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,

@@ -14,6 +14,7 @@
 #include <comppi/controller/Localization.h>
 #include <comppi/controller/Gexf.h>
 #include <comppi/controller/Namelookup.h>
+#include <comppi/controller/Namelist.h>
 
 bool parseArgs(
     int argc, char* argv[],
@@ -132,6 +133,11 @@ int dispatchCommand(
             {
                 using comppi::controller::Namelookup;
                 Namelookup controller(container);
+                return controller.generate();
+            }
+            else if (subcommand == "namelist") {
+                using comppi::controller::Namelist;
+                Namelist controller(container);
                 return controller.generate();
             }
             else
