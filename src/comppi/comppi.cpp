@@ -18,6 +18,45 @@
 #include <comppi/controller/CheckLoc.h>
 #include <comppi/controller/CheckSource.h>
 
+void showHelp(int argc, char* argv[]) {
+    std::cout
+        << "C++omPPI database builder and resurce generator. Usage:"
+        << std::endl << std::endl
+
+        << "    comppi [options] command [[subcommand], [input1, ...]]"
+        << std::endl << std::endl
+
+        << "Options:" << std::endl << std::endl
+
+        << "  -v,--verbose       Be verbose (set log level to debug)" << std::endl
+        << "  -V,--moreverbose   Be more verbose (set log level to trace)" << std::endl
+        << "  --root             Specify project root (dir of config/)" << std::endl
+        << std::endl
+
+        << "Commands:" << std::endl << std::endl
+
+        << "  build <subcmd> [source, ...]  Load specified or all sources into the database" << std::endl
+        << "    systemtype       Load systemtypes" << std::endl
+        << "    map              Load maps" << std::endl
+        << "    interaction      Load interactions" << std::endl
+        << "    localization     Load localizations" << std::endl
+        << std::endl
+
+        << "  generate <subcmd>  Generate derived resources and tables" << std::endl
+        << "    gexfgraph        Create .gexf graph based on interactions" << std::endl
+        << "    namelookup       Generate reverse name mapping" << std::endl
+        << "    namelist         Generate list of protein names" << std::endl
+        << std::endl
+
+        << "  check <subcmd>     Check configuration" << std::endl
+        << "    localization     Check localization tree" << std::endl
+        << "    source           Check source configurations" << std::endl
+        << std::endl
+        << "  help               Show this help"
+        << std::endl
+        ;
+}
+
 bool parseArgs(
     int argc, char* argv[],
     boost::program_options::variables_map& vm
@@ -62,7 +101,7 @@ bool parseArgs(
     }
 
     if (vm.count("help")) {
-        std::cout << cli << std::endl;
+        showHelp(argc, argv);
         return false;
     }
 
@@ -172,6 +211,9 @@ int dispatchCommand(
             std::cout << "Usage: check subcommand" << std::endl;
             return 0;
         }
+    } else if (command == "help") {
+        showHelp(argc, argv);
+        return 0;
     } else {
         std::cerr << "Unknown command" << std::endl;
         return 1;
