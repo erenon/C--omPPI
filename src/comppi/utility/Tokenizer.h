@@ -5,8 +5,9 @@
 #include <stdexcept>
 #include <iostream>
 #include <sstream>
+#include <cctype>
 
-//#include <boost/tokenizer.hpp>
+#include <boost/algorithm/string/trim.hpp>
 
 #include <comppi/service/log/Log.h>
 
@@ -89,6 +90,7 @@ public:
                 &&  reqFieldIdx < ReqFieldCount
                 ) {
                     if (currentField == _reqFieldIdxs[reqFieldIdx]) {
+                        boost::algorithm::trim_if(field, isspace);
                         _currentLine[reqFieldIdx++] = field;
                     }
                     ++currentField;
