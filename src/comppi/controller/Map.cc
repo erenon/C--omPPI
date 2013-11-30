@@ -1,6 +1,8 @@
 #include <stdexcept>
 #include <fstream>
 
+#include <boost/preprocessor/stringize.hpp>
+
 #include <comppi/controller/Map.h>
 #include <comppi/service/config/Config.h>
 #include <comppi/service/log/Log.h>
@@ -10,6 +12,7 @@
 #include <comppi/entity/gen/ProteinNameMap-odb.hxx>
 
 #include <comppi/service/driver/map/Biogrid.h>
+#include <comppi/service/driver/map/ComppiStandard.h>
 
 namespace comppi {
 namespace controller {
@@ -38,22 +41,30 @@ int Map::build(const service::config::Config& config) {
 
     INFO << "Build map source: '" << filePath << "'";
 
-    if (driverName == "Biogrid") {
-        using service::driver::map::Biogrid;
+#define IF_DRIVER(DName)                                 \
+    else if (driverName == BOOST_PP_STRINGIZE(DName) ) { \
+        using service::driver::map::DName;               \
+                                                         \
+    try {                                                \
+            DName driver(input, driverOptions);          \
+                                                         \
+            auto inserterPtr = _container.get<service::database::Inserter<DName>>(); \
+            inserterPtr->insert(driver);                 \
+        } catch (const std::invalid_argument&) {         \
+            ERROR << "Invalid driver configuration";     \
+        }                                                \
+    }                                                    \
+    /**/
 
-        try {
-            Biogrid driver(input, driverOptions);
-
-            auto inserterPtr = _container.get<service::database::Inserter<Biogrid>>();
-            inserterPtr->insert(driver);
-        } catch (const std::invalid_argument&) {
-            ERROR << "Invalid driver configuration";
-        }
-
-    } else {
+    if (false) {} /* IF_DRIVER macro requires this */
+    IF_DRIVER(Biogrid)
+    IF_DRIVER(ComppiStandard)
+    else {
         ERROR << "Invalid driver name in source config: '" << driverName << "'";
         return 1;
     }
+
+#undef IF_DRIVER
 
     return 0;
 }

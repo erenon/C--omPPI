@@ -4,5 +4,12 @@
         "file": "ce_biogrid/BIOGRID-IDENTIFIERS-3.1.92.tab.txt",
         "driver": "Biogrid",
         "driverOptions": {}
+    },
+    
+    "ce_ensembl_peptide": {
+    	"speciesAbbr": "ce",
+        "file": "ce_ensembl_peptide/comppi_worm_ensemblgeneid-ensemblpeptideid.txt",
+        "driver": "ComppiStandard",
+        "driverOptions": {}
     }
 }
