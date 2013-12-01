@@ -1,5 +1,7 @@
-Release/
-Debug/
+*.d
+*.o
+Debug/comppi
+Release/comppi
 Test/
 TestClang/
 
